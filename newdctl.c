@@ -41,6 +41,9 @@
 #include "parser.h"
 
 __dead void	 usage(void);
+int		 show_main_msg(struct imsg *);
+int		 show_engine_msg(struct imsg *);
+int		 show_frontend_msg(struct imsg *);
 
 struct imsgbuf	*ibuf;
 
@@ -153,6 +156,7 @@ main(int argc, char *argv[])
 				errx(1, "imsg_get error");
 			if (n == 0)
 				break;
+
 			switch (res->action) {
 			case NONE:
 			case LOG_VERBOSE:
@@ -163,10 +167,15 @@ main(int argc, char *argv[])
 				/* Shouldn't get here. */
 				break;
 			case SHOW_MAIN:
+				done = show_main_msg(&imsg);
 				break;
 			case SHOW_ENGINE:
+				done = show_engine_msg(&imsg);
 				break;
 			case SHOW_FRONTEND:
+				done = show_frontend_msg(&imsg);
+				break;
+			default:
 				break;
 			}
 			imsg_free(&imsg);
@@ -174,6 +183,69 @@ main(int argc, char *argv[])
 	}
 	close(ctl_sock);
 	free(ibuf);
+
+	return (0);
+}
+
+int
+show_main_msg(struct imsg *imsg)
+{
+	struct ctl_main_info *cmi;
+
+	switch (imsg->hdr.type) {
+	case IMSG_CTL_SHOW_MAIN_INFO:
+		cmi = imsg->data;
+		printf("main says: '%s'\n", cmi->text);
+		break;
+	case IMSG_CTL_END:
+		printf("\n");
+		return (1);
+	default:
+		break;
+	}
+
+	return (0);
+}
+
+int
+show_engine_msg(struct imsg *imsg)
+{
+	struct ctl_engine_info *cei;
+
+	switch (imsg->hdr.type) {
+	case IMSG_CTL_SHOW_ENGINE_INFO:
+		cei = imsg->data;
+		printf("engine says: '%s' %d %d %d %d\n",
+		    cei->name, cei->yesno, cei->integer, cei->group_v4_bits,
+		    cei->group_v6_bits);
+		break;
+	case IMSG_CTL_END:
+		printf("\n");
+		return (1);
+	default:
+		break;
+	}
+
+	return (0);
+}
+
+int
+show_frontend_msg(struct imsg *imsg)
+{
+	struct ctl_frontend_info *cfi;
+
+	switch (imsg->hdr.type) {
+	case IMSG_CTL_SHOW_FRONTEND_INFO:
+		cfi = imsg->data;
+		printf("frontend says: 0x%x %d %d '%s'",
+		    cfi->opts, cfi->yesno, cfi->integer, cfi->global_text);
+		break;
+	case IMSG_CTL_END:
+		printf("\n");
+		return (1);
+	default:
+		break;
+	}
 
 	return (0);
 }

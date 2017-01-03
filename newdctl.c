@@ -211,13 +211,21 @@ int
 show_engine_msg(struct imsg *imsg)
 {
 	struct ctl_engine_info *cei;
+	char buf[INET6_ADDRSTRLEN], *bufp;
 
 	switch (imsg->hdr.type) {
 	case IMSG_CTL_SHOW_ENGINE_INFO:
 		cei = imsg->data;
-		printf("engine says: '%s' %d %d %d %d\n",
-		    cei->name, cei->yesno, cei->integer, cei->group_v4_bits,
-		    cei->group_v6_bits);
+		printf("engine says: '%-*s' %s %d ", NEWD_MAXGROUPNAME,
+		    cei->name, cei->yesno ? "yes" : "no", cei->integer);
+		bufp = inet_net_ntop(AF_INET, &cei->group_v4address,
+		    cei->group_v4_bits, buf, sizeof(buf));
+		printf("\t%-*s ", INET_ADDRSTRLEN,
+		    bufp ? bufp : "<invalid IPv4>");
+		bufp = inet_net_ntop(AF_INET6, &cei->group_v6address,
+		    cei->group_v6_bits, buf, sizeof(buf));
+		printf("\t%-*s\n", INET6_ADDRSTRLEN,
+		    bufp ? bufp : "<invalid IPv6>");
 		break;
 	case IMSG_CTL_END:
 		printf("\n");

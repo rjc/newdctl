@@ -67,7 +67,7 @@ static const struct token t_log[] = {
 };
 
 static const struct token t_show[] = {
-	{KEYWORD,	"engine",	NONE,  t_show_engine},
+	{KEYWORD,	"engine",	SHOW_ENGINE,  t_show_engine},
 	{KEYWORD,	"main",		SHOW_MAIN,	NULL},
 	{KEYWORD,	"frontend",	SHOW_FRONTEND,	NULL},
 	{ENDTOKEN,	"",		NONE,		NULL}

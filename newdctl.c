@@ -117,6 +117,20 @@ main(int argc, char *argv[])
 		printf("logging request sent.\n");
 		done = 1;
 		break;
+	case SHOW:
+		/* Shouldn't get here. */
+		break;
+	case SHOW_MAIN:
+		imsg_compose(ibuf, IMSG_CTL_SHOW_MAIN_INFO, 0, 0, -1, NULL, 0);
+		break;
+	case SHOW_ENGINE:
+		imsg_compose(ibuf, IMSG_CTL_SHOW_ENGINE_INFO, 0, 0, -1,
+		    res->groupname, sizeof(res->groupname));
+		break;
+	case SHOW_FRONTEND:
+		imsg_compose(ibuf, IMSG_CTL_SHOW_FRONTEND_INFO, 0, 0, -1,
+		    NULL, 0);
+		break;
 	case RELOAD:
 		imsg_compose(ibuf, IMSG_CTL_RELOAD, 0, 0, -1, NULL, 0);
 		printf("reload request sent.\n");
@@ -144,6 +158,15 @@ main(int argc, char *argv[])
 			case LOG_VERBOSE:
 			case LOG_BRIEF:
 			case RELOAD:
+				break;
+			case SHOW:
+				/* Shouldn't get here. */
+				break;
+			case SHOW_MAIN:
+				break;
+			case SHOW_ENGINE:
+				break;
+			case SHOW_FRONTEND:
 				break;
 			}
 			imsg_free(&imsg);

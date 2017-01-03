@@ -37,6 +37,7 @@
 enum token_type {
 	NOTOKEN,
 	ENDTOKEN,
+	GROUPNAME,
 	KEYWORD
 };
 
@@ -49,16 +50,32 @@ struct token {
 
 static const struct token t_main[];
 static const struct token t_log[];
+static const struct token t_show[];
+static const struct token t_show_engine[];
 
 static const struct token t_main[] = {
 	{KEYWORD,	"reload",	RELOAD,		NULL},
+	{KEYWORD,	"show",		SHOW,		t_show},
 	{KEYWORD,	"log",		NONE,		t_log},
 	{ENDTOKEN,	"",		NONE,		NULL}
 };
 
 static const struct token t_log[] = {
-	{KEYWORD,	"verbose",	LOG_VERBOSE,		NULL},
-	{KEYWORD,	"brief",	LOG_BRIEF,		NULL},
+	{KEYWORD,	"verbose",	LOG_VERBOSE,	NULL},
+	{KEYWORD,	"brief",	LOG_BRIEF,	NULL},
+	{ENDTOKEN,	"",		NONE,		NULL}
+};
+
+static const struct token t_show[] = {
+	{KEYWORD,	"engine",	NONE,  t_show_engine},
+	{KEYWORD,	"main",		SHOW_MAIN,	NULL},
+	{KEYWORD,	"frontend",	SHOW_FRONTEND,	NULL},
+	{ENDTOKEN,	"",		NONE,		NULL}
+};
+
+static const struct token t_show_engine[] = {
+	{NOTOKEN,	"",		NONE,			NULL},
+	{GROUPNAME,	"",		SHOW_ENGINE,		NULL},
 	{ENDTOKEN,	"",		NONE,			NULL}
 };
 
@@ -103,6 +120,7 @@ static const struct token *
 match_token(const char *word, const struct token *table,
     struct parse_result *res)
 {
+	size_t			 n;
 	u_int			 i, match;
 	const struct token	*t = NULL;
 
@@ -114,6 +132,20 @@ match_token(const char *word, const struct token *table,
 			if (word == NULL || strlen(word) == 0) {
 				match++;
 				t = &table[i];
+			}
+			break;
+		case GROUPNAME:
+			if (!match && word != NULL && strlen(word) > 0) {
+				memset(res->groupname, 0,
+				    sizeof(res->groupname));
+				n = strlcpy(res->groupname, word,
+				    sizeof(res->groupname));
+				if (n >= sizeof(res->groupname))
+					err(1, "groupname too long");
+				match++;
+				t = &table[i];
+				if (t->value)
+					res->action = t->value;
 			}
 			break;
 		case KEYWORD:
@@ -152,6 +184,9 @@ show_valid_args(const struct token *table)
 		switch (table[i].type) {
 		case NOTOKEN:
 			fprintf(stderr, "  <cr>\n");
+			break;
+		case GROUPNAME:
+			fprintf(stderr, " <group>\n");
 			break;
 		case KEYWORD:
 			fprintf(stderr, "  %s\n", table[i].keyword);

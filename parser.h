@@ -21,11 +21,16 @@ enum actions {
 	NONE,
 	LOG_VERBOSE,
 	LOG_BRIEF,
+	SHOW,
+	SHOW_ENGINE,
+	SHOW_FRONTEND,
+	SHOW_MAIN,
 	RELOAD
 };
 
 struct parse_result {
 	enum actions	action;
+	char		groupname[NEWD_MAXGROUPNAME];
 };
 
 struct parse_result	*parse(int, char *[]);

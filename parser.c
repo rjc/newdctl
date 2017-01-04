@@ -1,6 +1,7 @@
-/*	$OpenBSD: parser.c,v 1.20 2011/05/09 12:25:35 claudio Exp $ */
+/*	$OpenBSD$	*/
 
 /*
+ * Copyright (c) YYYY YOUR NAME HERE <user@your.dom.ain>
  * Copyright (c) 2004 Esben Norby <norby@openbsd.org>
  * Copyright (c) 2003, 2004 Henning Brauer <henning@openbsd.org>
  *

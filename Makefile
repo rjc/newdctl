@@ -1,6 +1,6 @@
 #	$OpenBSD$
 
-.PATH:		${.CURDIR}/../ospfd
+.PATH:		${.CURDIR}/../newd
 
 PROG=	newdctl
 SRCS=	newdctl.c parser.c

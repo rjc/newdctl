@@ -1,6 +1,7 @@
 /*	$OpenBSD$	*/
 
 /*
+ * Copyright (c) YYYY YOUR NAME HERE <user@your.dom.ain>
  * Copyright (c) 2005 Claudio Jeker <claudio@openbsd.org>
  * Copyright (c) 2004, 2005 Esben Norby <norby@openbsd.org>
  * Copyright (c) 2003 Henning Brauer <henning@openbsd.org>
@@ -77,17 +78,16 @@ main(int argc, char *argv[])
 			break;
 		default:
 			usage();
-			/* NOTREACHED */
 		}
 	}
 	argc -= optind;
 	argv += optind;
 
-	/* parse options */
+	/* Parse command line. */
 	if ((res = parse(argc, argv)) == NULL)
 		exit(1);
 
-	/* connect to newd control socket */
+	/* Connect to control socket. */
 	if ((ctl_sock = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
 		err(1, "socket");
 
@@ -108,9 +108,6 @@ main(int argc, char *argv[])
 
 	/* process user request */
 	switch (res->action) {
-	case NONE:
-		usage();
-		/* not reached */
 	case LOG_VERBOSE:
 		verbose = 1;
 		/* FALLTHROUGH */
@@ -119,9 +116,6 @@ main(int argc, char *argv[])
 		    &verbose, sizeof(verbose));
 		printf("logging request sent.\n");
 		done = 1;
-		break;
-	case SHOW:
-		/* Shouldn't get here. */
 		break;
 	case SHOW_MAIN:
 		imsg_compose(ibuf, IMSG_CTL_SHOW_MAIN_INFO, 0, 0, -1, NULL, 0);
@@ -139,6 +133,8 @@ main(int argc, char *argv[])
 		printf("reload request sent.\n");
 		done = 1;
 		break;
+	default:
+		usage();
 	}
 
 	while (ibuf->w.queued)
@@ -162,9 +158,6 @@ main(int argc, char *argv[])
 			case LOG_VERBOSE:
 			case LOG_BRIEF:
 			case RELOAD:
-				break;
-			case SHOW:
-				/* Shouldn't get here. */
 				break;
 			case SHOW_MAIN:
 				done = show_main_msg(&imsg);
@@ -198,7 +191,6 @@ show_main_msg(struct imsg *imsg)
 		printf("main says: '%s'\n", cmi->text);
 		break;
 	case IMSG_CTL_END:
-		printf("\n");
 		return (1);
 	default:
 		break;
@@ -224,11 +216,11 @@ show_engine_msg(struct imsg *imsg)
 		    bufp ? bufp : "<invalid IPv4>");
 		bufp = inet_net_ntop(AF_INET6, &cei->group_v6address,
 		    cei->group_v6_bits, buf, sizeof(buf));
-		printf("\t%-*s\n", INET6_ADDRSTRLEN,
+		printf("\t%-*s", INET6_ADDRSTRLEN,
 		    bufp ? bufp : "<invalid IPv6>");
+		printf("\n");
 		break;
 	case IMSG_CTL_END:
-		printf("\n");
 		return (1);
 	default:
 		break;
@@ -247,9 +239,9 @@ show_frontend_msg(struct imsg *imsg)
 		cfi = imsg->data;
 		printf("frontend says: 0x%x %d %d '%s'",
 		    cfi->opts, cfi->yesno, cfi->integer, cfi->global_text);
+		printf("\n");
 		break;
 	case IMSG_CTL_END:
-		printf("\n");
 		return (1);
 	default:
 		break;

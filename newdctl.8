@@ -51,6 +51,20 @@ Disable verbose debug logging.
 Enable verbose debug logging.
 .It Cm reload
 Reload the configuration file.
+.It Cm show main
+Display information obtained from the main process.
+.It Cm show frontend
+Display information obtained from the frontend process.
+.It Cm show engine Op Ar groupname
+Display information obtained from the engine process.
+.Pp
+If
+.Ar groupname
+is specified only information relative to
+.Ar groupname
+is shown.
+.Pp
+Otherwise information on all groups is shown.
 .El
 .Sh FILES
 .Bl -tag -width "/var/run/newd.sockXX" -compact

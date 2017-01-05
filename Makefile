@@ -1,7 +1,5 @@
 #	$OpenBSD$
 
-.PATH:		${.CURDIR}/../newd
-
 PROG=	newdctl
 SRCS=	newdctl.c parser.c
 CFLAGS+= -Wall

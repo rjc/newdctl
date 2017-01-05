@@ -106,7 +106,7 @@ main(int argc, char *argv[])
 	imsg_init(ibuf, ctl_sock);
 	done = 0;
 
-	/* process user request */
+	/* Process user request. */
 	switch (res->action) {
 	case LOG_VERBOSE:
 		verbose = 1;
@@ -154,11 +154,6 @@ main(int argc, char *argv[])
 				break;
 
 			switch (res->action) {
-			case NONE:
-			case LOG_VERBOSE:
-			case LOG_BRIEF:
-			case RELOAD:
-				break;
 			case SHOW_MAIN:
 				done = show_main_msg(&imsg);
 				break;

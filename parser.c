@@ -75,9 +75,9 @@ static const struct token t_show[] = {
 };
 
 static const struct token t_show_engine[] = {
-	{NOTOKEN,	"",		NONE,			NULL},
-	{GROUPNAME,	"",		SHOW_ENGINE,		NULL},
-	{ENDTOKEN,	"",		NONE,			NULL}
+	{NOTOKEN,	"",		NONE,		NULL},
+	{GROUPNAME,	"",		SHOW_ENGINE,	NULL},
+	{ENDTOKEN,	"",		NONE,		NULL}
 };
 
 static const struct token *match_token(const char *, const struct token *,

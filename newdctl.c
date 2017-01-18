@@ -36,14 +36,14 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "proc.h"
 #include "newd.h"
-#include "frontend.h"
 #include "parser.h"
 
 __dead void	 usage(void);
-int		 show_main_msg(struct imsg *);
+int		 show_parent_msg(struct imsg *);
 int		 show_engine_msg(struct imsg *);
-int		 show_frontend_msg(struct imsg *);
+int		 show_control_msg(struct imsg *);
 
 struct imsgbuf	*ibuf;
 
@@ -111,24 +111,25 @@ main(int argc, char *argv[])
 		verbose = 1;
 		/* FALLTHROUGH */
 	case LOG_BRIEF:
-		imsg_compose(ibuf, IMSG_CTL_LOG_VERBOSE, 0, 0, -1,
+		imsg_compose(ibuf, IMSG_CTL_VERBOSE, 0, 0, -1,
 		    &verbose, sizeof(verbose));
 		printf("logging request sent.\n");
 		done = 1;
 		break;
-	case SHOW_MAIN:
-		imsg_compose(ibuf, IMSG_CTL_SHOW_MAIN_INFO, 0, 0, -1, NULL, 0);
+	case SHOW_PARENT:
+		imsg_compose(ibuf, IMSG_NEWDOP_GET_INFO_PARENT_REQUEST, 0,
+		    0, -1, NULL, 0);
 		break;
 	case SHOW_ENGINE:
-		imsg_compose(ibuf, IMSG_CTL_SHOW_ENGINE_INFO, 0, 0, -1,
-		    res->groupname, sizeof(res->groupname));
+		imsg_compose(ibuf, IMSG_NEWDOP_GET_INFO_ENGINE_REQUEST, 0,
+		    0, -1, res->groupname, sizeof(res->groupname));
 		break;
-	case SHOW_FRONTEND:
-		imsg_compose(ibuf, IMSG_CTL_SHOW_FRONTEND_INFO, 0, 0, -1,
-		    NULL, 0);
+	case SHOW_CONTROL:
+		imsg_compose(ibuf, IMSG_NEWDOP_GET_INFO_CONTROL_REQUEST, 0,
+		    0, -1, NULL, 0);
 		break;
 	case RELOAD:
-		imsg_compose(ibuf, IMSG_CTL_RELOAD, 0, 0, -1, NULL, 0);
+		imsg_compose(ibuf, IMSG_NEWDOP_RELOAD, 0, 0, -1, NULL, 0);
 		printf("reload request sent.\n");
 		done = 1;
 		break;
@@ -153,14 +154,14 @@ main(int argc, char *argv[])
 				break;
 
 			switch (res->action) {
-			case SHOW_MAIN:
-				done = show_main_msg(&imsg);
+			case SHOW_PARENT:
+				done = show_parent_msg(&imsg);
 				break;
 			case SHOW_ENGINE:
 				done = show_engine_msg(&imsg);
 				break;
-			case SHOW_FRONTEND:
-				done = show_frontend_msg(&imsg);
+			case SHOW_CONTROL:
+				done = show_control_msg(&imsg);
 				break;
 			default:
 				break;
@@ -175,14 +176,15 @@ main(int argc, char *argv[])
 }
 
 int
-show_main_msg(struct imsg *imsg)
+show_parent_msg(struct imsg *imsg)
 {
-	struct ctl_main_info *cmi;
+	struct newd_parent_info *npi;
 
 	switch (imsg->hdr.type) {
-	case IMSG_CTL_SHOW_MAIN_INFO:
-		cmi = imsg->data;
-		printf("main says: '%s'\n", cmi->text);
+	case IMSG_NEWDOP_GET_INFO_PARENT_DATA:
+	case IMSG_NEWDOP_GET_INFO_PARENT_END_DATA:
+		npi = imsg->data;
+		printf("parent says: '%s'\n", npi->text);
 		break;
 	case IMSG_CTL_END:
 		return (1);
@@ -196,20 +198,21 @@ show_main_msg(struct imsg *imsg)
 int
 show_engine_msg(struct imsg *imsg)
 {
-	struct ctl_engine_info *cei;
+	struct newd_engine_info *nei;
 	char buf[INET6_ADDRSTRLEN], *bufp;
 
 	switch (imsg->hdr.type) {
-	case IMSG_CTL_SHOW_ENGINE_INFO:
-		cei = imsg->data;
+	case IMSG_NEWDOP_GET_INFO_ENGINE_DATA:
+	case IMSG_NEWDOP_GET_INFO_ENGINE_END_DATA:
+		nei = imsg->data;
 		printf("engine says: '%-*s' %s %d ", NEWD_MAXGROUPNAME,
-		    cei->name, cei->yesno ? "yes" : "no", cei->integer);
-		bufp = inet_net_ntop(AF_INET, &cei->group_v4address,
-		    cei->group_v4_bits, buf, sizeof(buf));
+		    nei->name, nei->yesno ? "yes" : "no", nei->integer);
+		bufp = inet_net_ntop(AF_INET, &nei->group_v4address,
+		    nei->group_v4_bits, buf, sizeof(buf));
 		printf("\t%-*s ", INET_ADDRSTRLEN,
 		    bufp ? bufp : "<invalid IPv4>");
-		bufp = inet_net_ntop(AF_INET6, &cei->group_v6address,
-		    cei->group_v6_bits, buf, sizeof(buf));
+		bufp = inet_net_ntop(AF_INET6, &nei->group_v6address,
+		    nei->group_v6_bits, buf, sizeof(buf));
 		printf("\t%-*s", INET6_ADDRSTRLEN,
 		    bufp ? bufp : "<invalid IPv6>");
 		printf("\n");
@@ -224,15 +227,16 @@ show_engine_msg(struct imsg *imsg)
 }
 
 int
-show_frontend_msg(struct imsg *imsg)
+show_control_msg(struct imsg *imsg)
 {
-	struct ctl_frontend_info *cfi;
+	struct newd_control_info *nci;
 
 	switch (imsg->hdr.type) {
-	case IMSG_CTL_SHOW_FRONTEND_INFO:
-		cfi = imsg->data;
-		printf("frontend says: 0x%x %d %d '%s'",
-		    cfi->opts, cfi->yesno, cfi->integer, cfi->global_text);
+	case IMSG_NEWDOP_GET_INFO_CONTROL_DATA:
+	case IMSG_NEWDOP_GET_INFO_CONTROL_END_DATA:
+		nci = imsg->data;
+		printf("frontend says: %d %d '%s'",
+		    nci->yesno, nci->integer, nci->global_text);
 		printf("\n");
 		break;
 	case IMSG_CTL_END:

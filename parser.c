@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "proc.h"
 #include "newd.h"
 #include "parser.h"
 
@@ -68,8 +69,8 @@ static const struct token t_log[] = {
 
 static const struct token t_show[] = {
 	{KEYWORD,	"engine",	SHOW_ENGINE,  t_show_engine},
-	{KEYWORD,	"main",		SHOW_MAIN,	NULL},
-	{KEYWORD,	"frontend",	SHOW_FRONTEND,	NULL},
+	{KEYWORD,	"parent",	SHOW_PARENT,	NULL},
+	{KEYWORD,	"control",	SHOW_CONTROL,	NULL},
 	{ENDTOKEN,	"",		NONE,		NULL}
 };
 

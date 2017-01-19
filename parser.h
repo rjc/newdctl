@@ -25,7 +25,7 @@ enum actions {
 	SHOW_ENGINE,
 	SHOW_CONTROL,
 	SHOW_PARENT,
-	RELOAD
+	RESET
 };
 
 struct parse_result {

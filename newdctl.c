@@ -128,9 +128,9 @@ main(int argc, char *argv[])
 		imsg_compose(ibuf, IMSG_NEWDOP_GET_INFO_CONTROL_REQUEST, 0,
 		    0, -1, NULL, 0);
 		break;
-	case RELOAD:
-		imsg_compose(ibuf, IMSG_NEWDOP_RELOAD, 0, 0, -1, NULL, 0);
-		printf("reload request sent.\n");
+	case RESET:
+		imsg_compose(ibuf, IMSG_CTL_RESET, 0, 0, -1, NULL, 0);
+		printf("reset request sent.\n");
 		done = 1;
 		break;
 	default:

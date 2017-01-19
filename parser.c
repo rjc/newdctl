@@ -55,7 +55,7 @@ static const struct token t_show[];
 static const struct token t_show_engine[];
 
 static const struct token t_main[] = {
-	{KEYWORD,	"reload",	RELOAD,		NULL},
+	{KEYWORD,	"reset",	RESET,		NULL},
 	{KEYWORD,	"show",		SHOW,		t_show},
 	{KEYWORD,	"log",		NONE,		t_log},
 	{ENDTOKEN,	"",		NONE,		NULL}

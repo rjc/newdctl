@@ -204,7 +204,6 @@ show_engine_msg(struct imsg *imsg)
 
 	switch (imsg->hdr.type) {
 	case IMSG_NEWDOP_GET_INFO_ENGINE_DATA:
-	case IMSG_NEWDOP_GET_INFO_ENGINE_END_DATA:
 		nei = imsg->data;
 		printf("engine says: '%-*s' %s %d ", NEWD_MAXGROUPNAME,
 		    nei->name, nei->yesno ? "yes" : "no", nei->integer);
@@ -218,6 +217,7 @@ show_engine_msg(struct imsg *imsg)
 		    bufp ? bufp : "<invalid IPv6>");
 		printf("\n");
 		break;
+	case IMSG_NEWDOP_GET_INFO_ENGINE_END_DATA:
 	case IMSG_CTL_END:
 		return (1);
 	default:

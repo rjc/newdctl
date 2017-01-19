@@ -66,7 +66,7 @@ main(int argc, char *argv[])
 	int			 ctl_sock;
 	int			 done = 0;
 	int			 n, verbose = 0;
-	int			 ch;
+	int			 ch, v = 0;
 	char			*sockname;
 
 	sockname = NEWD_SOCKET;
@@ -129,7 +129,7 @@ main(int argc, char *argv[])
 		    0, -1, NULL, 0);
 		break;
 	case RESET:
-		imsg_compose(ibuf, IMSG_CTL_RESET, 0, 0, -1, NULL, 0);
+		imsg_compose(ibuf, IMSG_CTL_RESET, 0, 0, -1, &v, sizeof(v));
 		printf("reset request sent.\n");
 		done = 1;
 		break;

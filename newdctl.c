@@ -234,12 +234,12 @@ show_control_msg(struct imsg *imsg)
 
 	switch (imsg->hdr.type) {
 	case IMSG_NEWDOP_GET_INFO_CONTROL_DATA:
-	case IMSG_NEWDOP_GET_INFO_CONTROL_END_DATA:
 		nci = imsg->data;
-		printf("frontend says: %d %d '%s'",
-		    nci->yesno, nci->integer, nci->global_text);
+		printf("control says: '%s'",
+		    nci->verbose ? "verbose" : "brief");
 		printf("\n");
 		break;
+	case IMSG_NEWDOP_GET_INFO_CONTROL_END_DATA:
 	case IMSG_CTL_END:
 		return (1);
 	default:

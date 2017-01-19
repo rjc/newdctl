@@ -182,10 +182,11 @@ show_parent_msg(struct imsg *imsg)
 
 	switch (imsg->hdr.type) {
 	case IMSG_NEWDOP_GET_INFO_PARENT_DATA:
-	case IMSG_NEWDOP_GET_INFO_PARENT_END_DATA:
 		npi = imsg->data;
-		printf("parent says: '%s'\n", npi->text);
+		printf("parent says: '%s' (%s)\n", npi->text,
+		    npi->verbose ? "verbose" : "brief");
 		break;
+	case IMSG_NEWDOP_GET_INFO_PARENT_END_DATA:
 	case IMSG_CTL_END:
 		return (1);
 	default:

@@ -30,7 +30,7 @@ enum actions {
 
 struct parse_result {
 	enum actions	action;
-	char		groupname[NEWD_MAXGROUPNAME];
+	char		groupname[NETCFGD_MAXGROUPNAME];
 };
 
 struct parse_result	*parse(int, char *[]);

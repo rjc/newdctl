@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "newd.h"
+#include "netcfgd.h"
 #include "parser.h"
 
 enum token_type {

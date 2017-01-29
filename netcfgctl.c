@@ -36,7 +36,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "newd.h"
+#include "netcfgd.h"
 #include "frontend.h"
 #include "parser.h"
 
@@ -69,7 +69,7 @@ main(int argc, char *argv[])
 	int			 ch;
 	char			*sockname;
 
-	sockname = NEWD_SOCKET;
+	sockname = NETCFGD_SOCKET;
 	while ((ch = getopt(argc, argv, "s:")) != -1) {
 		switch (ch) {
 		case 's':
@@ -196,22 +196,20 @@ show_main_msg(struct imsg *imsg)
 int
 show_engine_msg(struct imsg *imsg)
 {
-	struct ctl_engine_info *cei;
-	char buf[INET6_ADDRSTRLEN], *bufp;
+	struct imsg_proposal *p;
 
 	switch (imsg->hdr.type) {
 	case IMSG_CTL_SHOW_ENGINE_INFO:
-		cei = imsg->data;
-		printf("engine says: '%-*s' %s %d ", NEWD_MAXGROUPNAME,
-		    cei->name, cei->yesno ? "yes" : "no", cei->integer);
-		bufp = inet_net_ntop(AF_INET, &cei->group_v4address,
-		    cei->group_v4_bits, buf, sizeof(buf));
-		printf("\t%-*s ", INET_ADDRSTRLEN,
-		    bufp ? bufp : "<invalid IPv4>");
-		bufp = inet_net_ntop(AF_INET6, &cei->group_v6address,
-		    cei->group_v6_bits, buf, sizeof(buf));
-		printf("\t%-*s", INET6_ADDRSTRLEN,
-		    bufp ? bufp : "<invalid IPv6>");
+		p = imsg->data;
+		printf("engine says: xid: %d index: %d source: %d mtu: %d\n",
+		    p->xid, p->index, p->source, p->mtu);
+		printf("             gateway: %s\n", inet_ntoa(p->gateway));
+		printf("                 ifa: %s\n", inet_ntoa(p->ifa));
+		printf("                mask: %s\n", inet_ntoa(p->mask));
+		printf("                dns1: %s\n", inet_ntoa(p->dns1));
+		printf("                dns2: %s\n", inet_ntoa(p->dns2));
+		printf("                dns3: %s\n", inet_ntoa(p->dns3));
+		printf("                dns4: %s\n", inet_ntoa(p->dns4));
 		printf("\n");
 		break;
 	case IMSG_CTL_END:
@@ -231,8 +229,8 @@ show_frontend_msg(struct imsg *imsg)
 	switch (imsg->hdr.type) {
 	case IMSG_CTL_SHOW_FRONTEND_INFO:
 		cfi = imsg->data;
-		printf("frontend says: 0x%x %d %d '%s'",
-		    cfi->opts, cfi->yesno, cfi->integer, cfi->global_text);
+		printf("frontend says: %d %d '%s'",
+		    cfi->yesno, cfi->integer, cfi->global_text);
 		printf("\n");
 		break;
 	case IMSG_CTL_END:

@@ -197,62 +197,106 @@ show_main_msg(struct imsg *imsg)
 int
 show_engine_msg(struct imsg *imsg)
 {
-	struct imsg_v4proposal *p4;
-	struct imsg_v6proposal *p6;
+	char			 buf[INET6_ADDRSTRLEN];
+	const char		*pbuf;
+	struct imsg_v4proposal	*p4;
+	struct imsg_v6proposal	*p6;
 
 	switch (imsg->hdr.type) {
 	case IMSG_CTL_SHOW_ENGINE_V4INFO:
 		p4 = imsg->data;
 		printf("engine says: xid: %d index: %d source: %d mtu: %d\n",
 		    p4->xid, p4->index, p4->source, p4->mtu);
-		if (p4->addrs & RTA_GATEWAY)
+		if (p4->addrs & RTA_GATEWAY) {
+			pbuf = inet_ntop(AF_INET, &p4->gateway, buf,
+			    INET_ADDRSTRLEN);
 			printf("             gateway: %s\n",
-			    inet_ntoa(p4->gateway));
-		if (p4->addrs & RTA_IFA)
+			    pbuf ? buf : strerror(errno));
+		}
+		if (p4->addrs & RTA_IFA) {
+			pbuf = inet_ntop(AF_INET, &p4->ifa, buf,
+			    INET_ADDRSTRLEN);
 			printf("                 ifa: %s\n",
-			    inet_ntoa(p4->ifa));
-		if (p4->addrs & RTA_NETMASK)
+			    pbuf ? buf : strerror(errno));
+		}
+		if (p4->addrs & RTA_NETMASK) {
+			pbuf = inet_ntop(AF_INET, &p4->netmask, buf,
+			    INET_ADDRSTRLEN);
 			printf("             netmask: %s\n",
-			    inet_ntoa(p4->mask));
-		if (p4->addrs & RTA_DNS1)
+			    pbuf ? buf : strerror(errno));
+		}
+		if (p4->addrs & RTA_DNS1) {
+			pbuf = inet_ntop(AF_INET, &p4->dns1, buf,
+			    INET_ADDRSTRLEN);
 			printf("                dns1: %s\n",
-			    inet_ntoa(p4->dns1));
-		if (p4->addrs & RTA_DNS2)
+			    pbuf ? buf : strerror(errno));
+		}
+		if (p4->addrs & RTA_DNS2) {
+			pbuf = inet_ntop(AF_INET, &p4->dns2, buf,
+			    INET_ADDRSTRLEN);
 			printf("                dns2: %s\n",
-			    inet_ntoa(p4->dns2));
-		if (p4->addrs & RTA_DNS3)
+			    pbuf ? buf : strerror(errno));
+		}
+		if (p4->addrs & RTA_DNS3) {
+			pbuf = inet_ntop(AF_INET, &p4->dns3, buf,
+			    INET_ADDRSTRLEN);
 			printf("                dns3: %s\n",
-			    inet_ntoa(p4->dns3));
-		if (p4->addrs & RTA_DNS4)
+			    pbuf ? buf : strerror(errno));
+		}
+		if (p4->addrs & RTA_DNS4) {
+			pbuf = inet_ntop(AF_INET, &p4->dns4, buf,
+			    INET_ADDRSTRLEN);
 			printf("                dns4: %s\n",
-			    inet_ntoa(p4->dns4));
+			    pbuf ? buf : strerror(errno));
+		}
 		printf("\n");
 		break;
 	case IMSG_CTL_SHOW_ENGINE_V6INFO:
 		p6 = imsg->data;
 		printf("engine says: xid: %d index: %d source: %d mtu: %d\n",
 		    p6->xid, p6->index, p6->source, p6->mtu);
-		if (p6->addrs & RTA_GATEWAY)
+		if (p6->addrs & RTA_GATEWAY) {
+			pbuf = inet_ntop(AF_INET6, &p6->gateway, buf,
+			    INET6_ADDRSTRLEN);
 			printf("             gateway: %s\n",
-			    "<IPv6 gateway>");
-		if (p6->addrs & RTA_IFA)
+			    pbuf ? buf : strerror(errno));
+		}
+		if (p6->addrs & RTA_IFA) {
+			pbuf = inet_ntop(AF_INET6, &p6->ifa, buf,
+			    INET6_ADDRSTRLEN);
 			printf("                 ifa: %s\n",
-			    "<IPv6 ifa>");
-		if (p6->addrs & RTA_NETMASK)
+			    pbuf ? buf : strerror(errno));
+		}
+		if (p6->addrs & RTA_NETMASK) {
+			pbuf = inet_ntop(AF_INET6, &p6->netmask, buf,
+			    INET6_ADDRSTRLEN);
 			printf("             netmask: %s\n",
-			    "<IPv6 netmask>");
-		if (p6->addrs & RTA_DNS1)
+			    pbuf ? buf : strerror(errno));
+		}
+		if (p6->addrs & RTA_DNS1) {
+			pbuf = inet_ntop(AF_INET6, &p6->dns1, buf,
+			    INET6_ADDRSTRLEN);
 			printf("                dns1: %s\n",
-			    "<IPv6 dns1>");
-		if (p6->addrs & RTA_DNS2)
+			    pbuf ? buf : strerror(errno));
+		}
+		if (p6->addrs & RTA_DNS2) {
+			pbuf = inet_ntop(AF_INET6, &p6->dns2, buf,
+			    INET6_ADDRSTRLEN);
 			printf("                dns2: %s\n",
-			    "<IPv6 dns2>");
-		if (p6->addrs & RTA_DNS3)
+			    pbuf ? buf : strerror(errno));
+		}
+		if (p6->addrs & RTA_DNS3) {
+			pbuf = inet_ntop(AF_INET6, &p6->dns3, buf,
+			    INET6_ADDRSTRLEN);
 			printf("                dns3: %s\n",
-			    "<IPv6 dn3>");
-		if (p6->addrs & RTA_DNS4)
+			    pbuf ? buf : strerror(errno));
+		}
+		if (p6->addrs & RTA_DNS4) {
+			pbuf = inet_ntop(AF_INET6, &p6->dns4, buf,
+			    INET6_ADDRSTRLEN);
 			printf("                dns4: %s\n",
-			    "<IPv6 dns4>");
+			    pbuf ? buf : strerror(errno));
+		}
 		printf("\n");
 		break;
 	case IMSG_CTL_END:

@@ -197,34 +197,62 @@ show_main_msg(struct imsg *imsg)
 int
 show_engine_msg(struct imsg *imsg)
 {
-	struct imsg_proposal *p;
+	struct imsg_v4proposal *p4;
+	struct imsg_v6proposal *p6;
 
 	switch (imsg->hdr.type) {
-	case IMSG_CTL_SHOW_ENGINE_INFO:
-		p = imsg->data;
+	case IMSG_CTL_SHOW_ENGINE_V4INFO:
+		p4 = imsg->data;
 		printf("engine says: xid: %d index: %d source: %d mtu: %d\n",
-		    p->xid, p->index, p->source, p->mtu);
-		if (p->addrs & RTA_GATEWAY)
+		    p4->xid, p4->index, p4->source, p4->mtu);
+		if (p4->addrs & RTA_GATEWAY)
 			printf("             gateway: %s\n",
-			    inet_ntoa(p->gateway));
-		if (p->addrs & RTA_IFA)
+			    inet_ntoa(p4->gateway));
+		if (p4->addrs & RTA_IFA)
 			printf("                 ifa: %s\n",
-			    inet_ntoa(p->ifa));
-		if (p->addrs & RTA_NETMASK)
+			    inet_ntoa(p4->ifa));
+		if (p4->addrs & RTA_NETMASK)
 			printf("             netmask: %s\n",
-			    inet_ntoa(p->mask));
-		if (p->addrs & RTA_DNS1)
+			    inet_ntoa(p4->mask));
+		if (p4->addrs & RTA_DNS1)
 			printf("                dns1: %s\n",
-			    inet_ntoa(p->dns1));
-		if (p->addrs & RTA_DNS2)
+			    inet_ntoa(p4->dns1));
+		if (p4->addrs & RTA_DNS2)
 			printf("                dns2: %s\n",
-			    inet_ntoa(p->dns2));
-		if (p->addrs & RTA_DNS3)
+			    inet_ntoa(p4->dns2));
+		if (p4->addrs & RTA_DNS3)
 			printf("                dns3: %s\n",
-			    inet_ntoa(p->dns3));
-		if (p->addrs & RTA_DNS4)
+			    inet_ntoa(p4->dns3));
+		if (p4->addrs & RTA_DNS4)
 			printf("                dns4: %s\n",
-			    inet_ntoa(p->dns4));
+			    inet_ntoa(p4->dns4));
+		printf("\n");
+		break;
+	case IMSG_CTL_SHOW_ENGINE_V6INFO:
+		p6 = imsg->data;
+		printf("engine says: xid: %d index: %d source: %d mtu: %d\n",
+		    p6->xid, p6->index, p6->source, p6->mtu);
+		if (p6->addrs & RTA_GATEWAY)
+			printf("             gateway: %s\n",
+			    "<IPv6 gateway>");
+		if (p6->addrs & RTA_IFA)
+			printf("                 ifa: %s\n",
+			    "<IPv6 ifa>");
+		if (p6->addrs & RTA_NETMASK)
+			printf("             netmask: %s\n",
+			    "<IPv6 netmask>");
+		if (p6->addrs & RTA_DNS1)
+			printf("                dns1: %s\n",
+			    "<IPv6 dns1>");
+		if (p6->addrs & RTA_DNS2)
+			printf("                dns2: %s\n",
+			    "<IPv6 dns2>");
+		if (p6->addrs & RTA_DNS3)
+			printf("                dns3: %s\n",
+			    "<IPv6 dn3>");
+		if (p6->addrs & RTA_DNS4)
+			printf("                dns4: %s\n",
+			    "<IPv6 dns4>");
 		printf("\n");
 		break;
 	case IMSG_CTL_END:

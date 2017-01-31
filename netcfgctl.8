@@ -1,5 +1,6 @@
 .\"	$OpenBSD$
 .\"
+.\" Copyright (c) 2017 Kenneth R Westerback <krw@openbsd.org>
 .\" Copyright (c) 2004, 2005 Esben Norby <norby@openbsd.org>
 .\"
 .\" Permission to use, copy, modify, and distribute this software for any
@@ -15,11 +16,11 @@
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
 .Dd $Mdocdate: July 27 2015 $
-.Dt NEWDCTL 8
+.Dt NETCFGCTL 8
 .Os
 .Sh NAME
-.Nm newdctl
-.Nd control the newd daemon
+.Nm netcfgctl
+.Nd control the netcfg daemon
 .Sh SYNOPSIS
 .Nm
 .Op Fl s Ar socket
@@ -29,7 +30,7 @@
 The
 .Nm
 program controls the
-.Xr newd 8
+.Xr netcfg 8
 daemon.
 .Pp
 The following options are available:
@@ -38,9 +39,9 @@ The following options are available:
 Use
 .Ar socket
 instead of the default
-.Pa /var/run/newd.sock
+.Pa /var/run/netcfgd.sock
 to communicate with
-.Xr newd 8 .
+.Xr netcfgd 8 .
 .El
 .Pp
 The following commands are available:
@@ -58,27 +59,33 @@ Delete the proposal with the xid
 Display information obtained from the main process.
 .It Cm show frontend
 Display information obtained from the frontend process.
-.It Cm show engine Op Ar groupname
-Display information obtained from the engine process.
+.It Cm show proposals Op Ar ifname
+Display active proposals.
 .Pp
 If
-.Ar groupname
-is specified only information relative to
-.Ar groupname
+.Ar ifname
+is specified only proposals relative to
+.Ar ifname
 is shown.
 .Pp
-Otherwise information on all groups is shown.
+Otherwise information on all interfaces is shown.
+.It Cm show dhclient
+Display active proposals from dhclient.
+.It Cm show slaac
+Display active proposals from slaacd.
+.It Cm show static
+Display active proposals from static configuration.
 .El
 .Sh FILES
-.Bl -tag -width "/var/run/newd.sockXX" -compact
+.Bl -tag -width "/var/run/netcfgd.sockXX" -compact
 .It Pa /var/run/newd.sock
 .Ux Ns -domain
 socket used for communication with
-.Xr newd 8 .
+.Xr netcfgd 8 .
 .El
 .Sh SEE ALSO
-.Xr newd.conf 5 ,
-.Xr newd 8
+.Xr netcfgd.conf 5 ,
+.Xr netcfgd 8
 .Sh HISTORY
 The
 .Nm

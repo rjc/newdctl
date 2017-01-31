@@ -22,7 +22,7 @@ enum actions {
 	LOG_VERBOSE,
 	LOG_BRIEF,
 	SHOW,
-	SHOW_ENGINE,
+	SHOW_PROPOSALS,
 	SHOW_FRONTEND,
 	SHOW_MAIN,
 	RELOAD,
@@ -31,7 +31,7 @@ enum actions {
 
 struct parse_result {
 	enum actions	action;
-	char		groupname[NETCFGD_MAXGROUPNAME];
+	char		ifname[IF_NAMESIZE];
 	int		xid;
 };
 

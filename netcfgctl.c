@@ -25,6 +25,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <net/if_media.h>
+#include <net/if.h>
 #include <net/if_types.h>
 #include <net/route.h>
 
@@ -43,7 +44,7 @@
 
 __dead void	 usage(void);
 int		 show_main_msg(struct imsg *);
-int		 show_engine_msg(struct imsg *);
+int		 show_proposals_msg(struct imsg *);
 int		 show_frontend_msg(struct imsg *);
 
 struct imsgbuf	*ibuf;
@@ -126,9 +127,9 @@ main(int argc, char *argv[])
 	case SHOW_MAIN:
 		imsg_compose(ibuf, IMSG_CTL_SHOW_MAIN_INFO, 0, 0, -1, NULL, 0);
 		break;
-	case SHOW_ENGINE:
-		imsg_compose(ibuf, IMSG_CTL_SHOW_ENGINE_INFO, 0, 0, -1,
-		    res->groupname, sizeof(res->groupname));
+	case SHOW_PROPOSALS:
+		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
+		    res->ifname, sizeof(res->ifname));
 		break;
 	case SHOW_FRONTEND:
 		imsg_compose(ibuf, IMSG_CTL_SHOW_FRONTEND_INFO, 0, 0, -1,
@@ -163,8 +164,8 @@ main(int argc, char *argv[])
 			case SHOW_MAIN:
 				done = show_main_msg(&imsg);
 				break;
-			case SHOW_ENGINE:
-				done = show_engine_msg(&imsg);
+			case SHOW_PROPOSALS:
+				done = show_proposals_msg(&imsg);
 				break;
 			case SHOW_FRONTEND:
 				done = show_frontend_msg(&imsg);
@@ -201,7 +202,7 @@ show_main_msg(struct imsg *imsg)
 }
 
 int
-show_engine_msg(struct imsg *imsg)
+show_proposals_msg(struct imsg *imsg)
 {
 	char			 buf[INET6_ADDRSTRLEN];
 	const char		*pbuf;
@@ -209,9 +210,9 @@ show_engine_msg(struct imsg *imsg)
 	struct imsg_v6proposal	*p6;
 
 	switch (imsg->hdr.type) {
-	case IMSG_CTL_SHOW_ENGINE_V4INFO:
+	case IMSG_CTL_SHOW_DHCLIENT:
 		p4 = imsg->data;
-		printf("engine says: xid: %d index: %d source: %d mtu: %d\n",
+		printf("xid: %d index: %d source: %d mtu: %d\n",
 		    p4->xid, p4->index, p4->source, p4->mtu);
 		if (p4->addrs & RTA_GATEWAY) {
 			pbuf = inet_ntop(AF_INET, &p4->gateway, buf,
@@ -257,9 +258,9 @@ show_engine_msg(struct imsg *imsg)
 		}
 		printf("\n");
 		break;
-	case IMSG_CTL_SHOW_ENGINE_V6INFO:
+	case IMSG_CTL_SHOW_SLAAC:
 		p6 = imsg->data;
-		printf("engine says: xid: %d index: %d source: %d mtu: %d\n",
+		printf("xid: %d index: %d source: %d mtu: %d\n",
 		    p6->xid, p6->index, p6->source, p6->mtu);
 		if (p6->addrs & RTA_GATEWAY) {
 			pbuf = inet_ntop(AF_INET6, &p6->gateway, buf,

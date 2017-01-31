@@ -131,6 +131,12 @@ main(int argc, char *argv[])
 		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
 		    res->ifname, sizeof(res->ifname));
 		break;
+	case SHOW_DHCLIENT:
+		imsg_compose(ibuf, IMSG_CTL_SHOW_DHCLIENT, 0, 0, -1, NULL, 0);
+		break;
+	case SHOW_SLAAC:
+		imsg_compose(ibuf, IMSG_CTL_SHOW_SLAAC, 0, 0, -1, NULL, 0);
+		break;
 	case SHOW_FRONTEND:
 		imsg_compose(ibuf, IMSG_CTL_SHOW_FRONTEND_INFO, 0, 0, -1,
 		    NULL, 0);
@@ -164,6 +170,8 @@ main(int argc, char *argv[])
 			case SHOW_MAIN:
 				done = show_main_msg(&imsg);
 				break;
+			case SHOW_DHCLIENT:
+			case SHOW_SLAAC:
 			case SHOW_PROPOSALS:
 				done = show_proposals_msg(&imsg);
 				break;

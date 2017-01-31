@@ -74,6 +74,8 @@ static const struct token t_show[] = {
 	{KEYWORD,	"proposals",	SHOW_PROPOSALS,	t_show_proposals},
 	{KEYWORD,	"main",		SHOW_MAIN,	NULL},
 	{KEYWORD,	"frontend",	SHOW_FRONTEND,	NULL},
+	{KEYWORD,	"dhclient",	SHOW_DHCLIENT,	NULL},
+	{KEYWORD,	"slaac",	SHOW_SLAAC,	NULL},
 	{ENDTOKEN,	"",		NONE,		NULL}
 };
 

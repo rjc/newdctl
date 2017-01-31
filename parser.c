@@ -38,6 +38,7 @@ enum token_type {
 	NOTOKEN,
 	ENDTOKEN,
 	GROUPNAME,
+	XID,
 	KEYWORD
 };
 
@@ -52,11 +53,13 @@ static const struct token t_main[];
 static const struct token t_log[];
 static const struct token t_show[];
 static const struct token t_show_engine[];
+static const struct token t_kill[];
 
 static const struct token t_main[] = {
 	{KEYWORD,	"reload",	RELOAD,		NULL},
 	{KEYWORD,	"show",		SHOW,		t_show},
 	{KEYWORD,	"log",		NONE,		t_log},
+	{KEYWORD,	"kill",		NONE,		t_kill},
 	{ENDTOKEN,	"",		NONE,		NULL}
 };
 
@@ -76,6 +79,11 @@ static const struct token t_show[] = {
 static const struct token t_show_engine[] = {
 	{NOTOKEN,	"",		NONE,		NULL},
 	{GROUPNAME,	"",		SHOW_ENGINE,	NULL},
+	{ENDTOKEN,	"",		NONE,		NULL}
+};
+
+static const struct token t_kill[] = {
+	{XID,		"",		KILL_XID,	NULL},
 	{ENDTOKEN,	"",		NONE,		NULL}
 };
 
@@ -148,6 +156,19 @@ match_token(const char *word, const struct token *table,
 					res->action = t->value;
 			}
 			break;
+		case XID:
+			if (!match && word != NULL && strlen(word) > 0) {
+				const char *errstr;
+				res->xid = strtonum(word, INT_MIN, INT_MAX,
+				    &errstr);
+				if (errstr != NULL)
+					errx(1, "xid is %s:%s", errstr, word);
+				match++;
+				t = &table[i];
+				if (t->value)
+					res->action = t->value;
+			}
+			break;
 		case KEYWORD:
 			if (word != NULL && strncmp(word, table[i].keyword,
 			    strlen(word)) == 0) {
@@ -190,6 +211,9 @@ show_valid_args(const struct token *table)
 			break;
 		case KEYWORD:
 			fprintf(stderr, "  %s\n", table[i].keyword);
+			break;
+		case XID:
+			fprintf(stderr, " <xid>\n");
 			break;
 		case ENDTOKEN:
 			break;

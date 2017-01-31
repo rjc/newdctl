@@ -25,12 +25,14 @@ enum actions {
 	SHOW_ENGINE,
 	SHOW_FRONTEND,
 	SHOW_MAIN,
-	RELOAD
+	RELOAD,
+	KILL_XID
 };
 
 struct parse_result {
 	enum actions	action;
 	char		groupname[NETCFGD_MAXGROUPNAME];
+	int		xid;
 };
 
 struct parse_result	*parse(int, char *[]);

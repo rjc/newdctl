@@ -108,6 +108,12 @@ main(int argc, char *argv[])
 
 	/* Process user request. */
 	switch (res->action) {
+	case KILL_XID:
+		imsg_compose(ibuf, IMSG_CTL_KILL_PROPOSAL, 0, 0, -1,
+		    &res->xid, sizeof(res->xid));
+		printf("kill proposal '%d' request send.\n", res->xid);
+		done = 1;
+		break;
 	case LOG_VERBOSE:
 		verbose = 1;
 		/* FALLTHROUGH */

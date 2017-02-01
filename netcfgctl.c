@@ -130,7 +130,7 @@ main(int argc, char *argv[])
 		break;
 	case SHOW_PROPOSALS:
 		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
-		    res->ifname, sizeof(res->ifname));
+		    &res->ifindex, sizeof(res->ifindex));
 		break;
 	case SHOW_DHCLIENT:
 		imsg_compose(ibuf, IMSG_CTL_SHOW_DHCLIENT, 0, 0, -1, NULL, 0);

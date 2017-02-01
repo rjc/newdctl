@@ -34,7 +34,7 @@ enum actions {
 
 struct parse_result {
 	enum actions	action;
-	char		ifname[IF_NAMESIZE];
+	int		ifindex;
 	int		xid;
 };
 

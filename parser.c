@@ -132,9 +132,10 @@ static const struct token *
 match_token(const char *word, const struct token *table,
     struct parse_result *res)
 {
-	size_t			 n;
-	u_int			 i, match;
+	char			 ifname[IF_NAMESIZE];
 	const struct token	*t = NULL;
+	size_t			 n;
+	u_int			 i, match, index;
 
 	match = 0;
 
@@ -148,12 +149,14 @@ match_token(const char *word, const struct token *table,
 			break;
 		case IFNAME:
 			if (!match && word != NULL && strlen(word) > 0) {
-				memset(res->ifname, 0,
-				    sizeof(res->ifname));
-				n = strlcpy(res->ifname, word,
-				    sizeof(res->ifname));
-				if (n >= sizeof(res->ifname))
+				n = strlcpy(ifname, word,
+				    sizeof(ifname));
+				if (n >= sizeof(ifname))
 					err(1, "ifname too long");
+				index = if_nametoindex(ifname);
+				if (index == 0)
+					err(1, "'%s' not found", ifname);
+				res->ifindex = index;
 				match++;
 				t = &table[i];
 				if (t->value)

@@ -63,14 +63,15 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	struct sockaddr_un	 sun;
-	struct parse_result	*res;
 	struct imsg		 imsg;
+	struct sockaddr_un	 sun;
+	struct ctl_show_proposal csp;
+	struct parse_result	*res;
+	char			*sockname;
 	int			 ctl_sock;
 	int			 done = 0;
 	int			 n, verbose = 0;
 	int			 ch;
-	char			*sockname;
 
 	sockname = NETCFGD_SOCKET;
 	while ((ch = getopt(argc, argv, "s:")) != -1) {
@@ -120,7 +121,7 @@ main(int argc, char *argv[])
 		verbose = 1;
 		/* FALLTHROUGH */
 	case LOG_BRIEF:
-		imsg_compose(ibuf, IMSG_CTL_LOG_VERBOSE, 0, 0, -1,
+		imsg_compose(ibuf, IMSG_CTL_LOG_LEVEL, 0, 0, -1,
 		    &verbose, sizeof(verbose));
 		printf("logging request sent.\n");
 		done = 1;
@@ -128,15 +129,29 @@ main(int argc, char *argv[])
 	case SHOW_MAIN:
 		imsg_compose(ibuf, IMSG_CTL_SHOW_MAIN_INFO, 0, 0, -1, NULL, 0);
 		break;
-	case SHOW_PROPOSALS:
+	case SHOW_STATIC:
+		csp.ifindex = res->ifindex;
+		csp.source = STATIC_PROPOSAL;
 		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
-		    &res->ifindex, sizeof(res->ifindex));
+		    &csp, sizeof(csp));
 		break;
 	case SHOW_DHCLIENT:
-		imsg_compose(ibuf, IMSG_CTL_SHOW_DHCLIENT, 0, 0, -1, NULL, 0);
+		csp.ifindex = res->ifindex;
+		csp.source = DHCLIENT_PROPOSAL;
+		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
+		    &csp, sizeof(csp));
 		break;
 	case SHOW_SLAAC:
-		imsg_compose(ibuf, IMSG_CTL_SHOW_SLAAC, 0, 0, -1, NULL, 0);
+		csp.ifindex = res->ifindex;
+		csp.source = SLAAC_PROPOSAL;
+		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
+		    &csp, sizeof(csp));
+		break;
+	case SHOW_PROPOSALS:
+		csp.ifindex = res->ifindex;
+		csp.source = res->source;
+		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
+		    &csp, sizeof(csp));
 		break;
 	case SHOW_FRONTEND:
 		imsg_compose(ibuf, IMSG_CTL_SHOW_FRONTEND_INFO, 0, 0, -1,
@@ -173,6 +188,7 @@ main(int argc, char *argv[])
 				break;
 			case SHOW_DHCLIENT:
 			case SHOW_SLAAC:
+			case SHOW_STATIC:
 			case SHOW_PROPOSALS:
 				done = show_proposals_msg(&imsg);
 				break;
@@ -219,7 +235,7 @@ show_proposals_msg(struct imsg *imsg)
 	struct imsg_v6proposal	*p6;
 
 	switch (imsg->hdr.type) {
-	case IMSG_CTL_SHOW_DHCLIENT:
+	case IMSG_CTL_REPLY_V4PROPOSAL:
 		p4 = imsg->data;
 		printf("xid: %d index: %d source: %d mtu: %d\n",
 		    p4->xid, p4->index, p4->source, p4->mtu);
@@ -267,7 +283,7 @@ show_proposals_msg(struct imsg *imsg)
 		}
 		printf("\n");
 		break;
-	case IMSG_CTL_SHOW_SLAAC:
+	case IMSG_CTL_REPLY_V6PROPOSAL:
 		p6 = imsg->data;
 		printf("xid: %d index: %d source: %d mtu: %d\n",
 		    p6->xid, p6->index, p6->source, p6->mtu);

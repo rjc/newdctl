@@ -22,6 +22,7 @@
 #include <sys/queue.h>
 #include <sys/socket.h>
 #include <net/if.h>
+#include <net/route.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <err.h>
@@ -52,43 +53,44 @@ struct token {
 };
 
 static const struct token t_main[];
-static const struct token t_log[];
+static const struct token t_loglevel[];
 static const struct token t_show[];
-static const struct token t_show_proposals[];
-static const struct token t_kill[];
+static const struct token t_ifname[];
+static const struct token t_xid[];
 
 static const struct token t_main[] = {
 	{KEYWORD,	"reload",	RELOAD,		NULL},
-	{KEYWORD,	"show",		SHOW,		t_show},
-	{KEYWORD,	"log",		NONE,		t_log},
-	{KEYWORD,	"kill",		NONE,		t_kill},
+	{KEYWORD,	"show",		NONE,		t_show},
+	{KEYWORD,	"log",		NONE,		t_loglevel},
+	{KEYWORD,	"kill",		KILL_XID,	t_xid},
 	{ENDTOKEN,	"",		NONE,		NULL}
 };
 
-static const struct token t_log[] = {
+static const struct token t_loglevel[] = {
 	{KEYWORD,	"verbose",	LOG_VERBOSE,	NULL},
 	{KEYWORD,	"brief",	LOG_BRIEF,	NULL},
 	{ENDTOKEN,	"",		NONE,		NULL}
 };
 
 static const struct token t_show[] = {
-	{KEYWORD,	"proposals",	SHOW_PROPOSALS,	t_show_proposals},
+	{KEYWORD,	"proposals",	SHOW_PROPOSALS,	t_ifname},
 	{KEYWORD,	"main",		SHOW_MAIN,	NULL},
 	{KEYWORD,	"frontend",	SHOW_FRONTEND,	NULL},
-	{KEYWORD,	"dhclient",	SHOW_DHCLIENT,	NULL},
-	{KEYWORD,	"slaac",	SHOW_SLAAC,	NULL},
+	{KEYWORD,	"static",	SHOW_STATIC,	t_ifname},
+	{KEYWORD,	"dhclient",	SHOW_DHCLIENT,	t_ifname},
+	{KEYWORD,	"slaac",	SHOW_SLAAC,	t_ifname},
 	{ENDTOKEN,	"",		NONE,		NULL}
 };
 
-static const struct token t_show_proposals[] = {
+static const struct token t_ifname[] = {
 	{NOTOKEN,	"",		NONE,		NULL},
-	{IFNAME,	"",		SHOW_PROPOSALS,	NULL},
+	{IFNAME,	"",		NONE,		NULL},
 	{ENDTOKEN,	"",		NONE,		NULL}
 };
 
-static const struct token t_kill[] = {
-	{XID,		"",		KILL_XID,	NULL},
-	{ENDTOKEN,	"",		NONE,		NULL}
+static const struct token t_xid[] = {
+	{XID,		"",		NONE,	NULL},
+	{ENDTOKEN,	"",		NONE,	NULL}
 };
 
 static const struct token *match_token(const char *, const struct token *,
@@ -155,7 +157,7 @@ match_token(const char *word, const struct token *table,
 					err(1, "ifname too long");
 				index = if_nametoindex(ifname);
 				if (index == 0)
-					err(1, "'%s' not found", ifname);
+					err(1, "'%s'", ifname);
 				res->ifindex = index;
 				match++;
 				t = &table[i];

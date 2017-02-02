@@ -67,14 +67,34 @@ If
 is specified only proposals relative to
 .Ar ifname
 is shown.
-.Pp
 Otherwise information on all interfaces is shown.
-.It Cm show dhclient
+.It Cm show dhclient Op Ar ifname
 Display active proposals from dhclient.
-.It Cm show slaac
+.Pp
+If
+.Ar ifname
+is specified only proposals relative to
+.Ar ifname
+is shown.
+Otherwise information on all interfaces is shown.
+.It Cm show slaac Op Ar ifname
 Display active proposals from slaacd.
-.It Cm show static
+.Pp
+If
+.Ar ifname
+is specified only proposals relative to
+.Ar ifname
+is shown.
+Otherwise information on all interfaces is shown.
+.It Cm show static Op Ar ifname
 Display active proposals from static configuration.
+.Pp
+If
+.Ar ifname
+is specified only proposals relative to
+.Ar ifname
+is shown.
+Otherwise information on all interfaces is shown.
 .El
 .Sh FILES
 .Bl -tag -width "/var/run/netcfgd.sockXX" -compact

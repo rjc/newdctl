@@ -26,6 +26,7 @@ enum actions {
 	SHOW_PROPOSALS,
 	SHOW_DHCLIENT,
 	SHOW_SLAAC,
+	SHOW_STATIC,
 	SHOW_FRONTEND,
 	SHOW_MAIN,
 	RELOAD,
@@ -33,9 +34,10 @@ enum actions {
 };
 
 struct parse_result {
-	enum actions	action;
-	int		ifindex;
-	int		xid;
+	enum actions			action;
+	int				ifindex;
+	int				xid;
+	int				source;
 };
 
 struct parse_result	*parse(int, char *[]);

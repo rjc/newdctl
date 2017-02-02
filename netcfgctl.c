@@ -149,7 +149,7 @@ main(int argc, char *argv[])
 		break;
 	case SHOW_PROPOSALS:
 		csp.ifindex = res->ifindex;
-		csp.source = res->source;
+		csp.source = 0;
 		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
 		    &csp, sizeof(csp));
 		break;

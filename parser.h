@@ -37,7 +37,6 @@ struct parse_result {
 	enum actions			action;
 	int				ifindex;
 	int				xid;
-	int				source;
 };
 
 struct parse_result	*parse(int, char *[]);

@@ -19,15 +19,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <sys/types.h>
-#include <sys/queue.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <net/if_media.h>
 #include <net/if.h>
-#include <net/if_types.h>
 #include <net/route.h>
 
 #include <err.h>

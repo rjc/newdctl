@@ -30,13 +30,15 @@ enum actions {
 	SHOW_FRONTEND,
 	SHOW_MAIN,
 	RELOAD,
-	KILL_XID
+	KILL_XID,
+	ENABLE_SOURCE,
+	DISABLE_SOURCE
 };
 
 struct parse_result {
 	enum actions			action;
 	int				ifindex;
-	int				xid;
+	int				payload;
 };
 
 struct parse_result	*parse(int, char *[]);

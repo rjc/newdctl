@@ -65,7 +65,7 @@ main(int argc, char *argv[])
 {
 	struct imsg		 imsg;
 	struct sockaddr_un	 sun;
-	struct ctl_show_proposal csp;
+	struct ctl_policy_id	 cpid;
 	struct parse_result	*res;
 	char			*sockname;
 	int			 ctl_sock;
@@ -113,8 +113,8 @@ main(int argc, char *argv[])
 	switch (res->action) {
 	case KILL_XID:
 		imsg_compose(ibuf, IMSG_CTL_KILL_PROPOSAL, 0, 0, -1,
-		    &res->xid, sizeof(res->xid));
-		printf("kill proposal '%d' request send.\n", res->xid);
+		    &res->payload, sizeof(res->payload));
+		printf("kill proposal '%d' request send.\n", res->payload);
 		done = 1;
 		break;
 	case LOG_VERBOSE:
@@ -130,28 +130,28 @@ main(int argc, char *argv[])
 		imsg_compose(ibuf, IMSG_CTL_SHOW_MAIN_INFO, 0, 0, -1, NULL, 0);
 		break;
 	case SHOW_STATIC:
-		csp.ifindex = res->ifindex;
-		csp.source = STATIC_PROPOSAL;
+		cpid.ifindex = res->ifindex;
+		cpid.source = STATIC_PROPOSAL;
 		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
-		    &csp, sizeof(csp));
+		    &cpid, sizeof(cpid));
 		break;
 	case SHOW_DHCLIENT:
-		csp.ifindex = res->ifindex;
-		csp.source = DHCLIENT_PROPOSAL;
+		cpid.ifindex = res->ifindex;
+		cpid.source = DHCLIENT_PROPOSAL;
 		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
-		    &csp, sizeof(csp));
+		    &cpid, sizeof(cpid));
 		break;
 	case SHOW_SLAAC:
-		csp.ifindex = res->ifindex;
-		csp.source = SLAAC_PROPOSAL;
+		cpid.ifindex = res->ifindex;
+		cpid.source = SLAAC_PROPOSAL;
 		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
-		    &csp, sizeof(csp));
+		    &cpid, sizeof(cpid));
 		break;
 	case SHOW_PROPOSALS:
-		csp.ifindex = res->ifindex;
-		csp.source = 0;
+		cpid.ifindex = res->ifindex;
+		cpid.source = 0;
 		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
-		    &csp, sizeof(csp));
+		    &cpid, sizeof(cpid));
 		break;
 	case SHOW_FRONTEND:
 		imsg_compose(ibuf, IMSG_CTL_SHOW_FRONTEND_INFO, 0, 0, -1,
@@ -160,6 +160,20 @@ main(int argc, char *argv[])
 	case RELOAD:
 		imsg_compose(ibuf, IMSG_CTL_RELOAD, 0, 0, -1, NULL, 0);
 		printf("reload request sent.\n");
+		done = 1;
+		break;
+	case ENABLE_SOURCE:
+		cpid.ifindex = res->ifindex;
+		cpid.source = res->payload;
+		imsg_compose(ibuf, IMSG_CTL_SET_SOURCE_STATE, 0, 0, -1,
+		    &cpid, sizeof(cpid));
+		done = 1;
+		break;
+	case DISABLE_SOURCE:
+		cpid.ifindex = res->ifindex;
+		cpid.source = -res->payload;
+		imsg_compose(ibuf, IMSG_CTL_SET_SOURCE_STATE, 0, 0, -1,
+		    &cpid, sizeof(cpid));
 		done = 1;
 		break;
 	default:

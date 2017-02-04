@@ -42,6 +42,7 @@ enum token_type {
 	ENDTOKEN,
 	IFNAME,
 	XID,
+	SOURCE,
 	KEYWORD
 };
 
@@ -57,12 +58,15 @@ static const struct token t_loglevel[];
 static const struct token t_show[];
 static const struct token t_ifname[];
 static const struct token t_xid[];
+static const struct token t_source[];
 
 static const struct token t_main[] = {
 	{KEYWORD,	"reload",	RELOAD,		NULL},
 	{KEYWORD,	"show",		NONE,		t_show},
 	{KEYWORD,	"log",		NONE,		t_loglevel},
 	{KEYWORD,	"kill",		KILL_XID,	t_xid},
+	{KEYWORD,	"enable",	ENABLE_SOURCE,	t_source},
+	{KEYWORD,	"disable",	DISABLE_SOURCE,	t_source},
 	{ENDTOKEN,	"",		NONE,		NULL}
 };
 
@@ -80,6 +84,13 @@ static const struct token t_show[] = {
 	{KEYWORD,	"dhclient",	SHOW_DHCLIENT,	t_ifname},
 	{KEYWORD,	"slaac",	SHOW_SLAAC,	t_ifname},
 	{ENDTOKEN,	"",		NONE,		NULL}
+};
+
+static const struct token t_source[] = {
+	{SOURCE,	"static",	NONE,	t_ifname},
+	{SOURCE,	"dhclient",	NONE,	t_ifname},
+	{SOURCE,	"slaac",	NONE,	t_ifname},
+	{ENDTOKEN,	"",		NONE,	NULL}
 };
 
 static const struct token t_ifname[] = {
@@ -168,10 +179,28 @@ match_token(const char *word, const struct token *table,
 		case XID:
 			if (!match && word != NULL && strlen(word) > 0) {
 				const char *errstr;
-				res->xid = strtonum(word, INT_MIN, INT_MAX,
+				res->payload = strtonum(word, INT_MIN, INT_MAX,
 				    &errstr);
 				if (errstr != NULL)
 					errx(1, "xid is %s:%s", errstr, word);
+				match++;
+				t = &table[i];
+				if (t->value)
+					res->action = t->value;
+			}
+			break;
+		case SOURCE:
+			if (!match && word != NULL && strlen(word) > 0) {
+				if (strcmp(word, "dhclient") == 0)
+					res->payload = DHCLIENT_PROPOSAL;
+				else if (strcmp(word, "slaac") == 0)
+					res->payload = SLAAC_PROPOSAL;
+				else if (strcmp(word, "static") == 0)
+					res->payload = STATIC_PROPOSAL;
+				else {
+					fprintf(stderr, "not a good source");
+					break;
+				}
 				match++;
 				t = &table[i];
 				if (t->value)
@@ -223,6 +252,9 @@ show_valid_args(const struct token *table)
 			break;
 		case XID:
 			fprintf(stderr, " <xid>\n");
+			break;
+		case SOURCE:
+			fprintf(stderr, " dhclient | slaac | static");
 			break;
 		case ENDTOKEN:
 			break;

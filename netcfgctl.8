@@ -46,15 +46,19 @@ to communicate with
 .Pp
 The following commands are available:
 .Bl -tag -width Ds
+.It Cm disable (dhclient | slaac | static) Op Ar ifname
+Disable processing of further proposals of the specified source.
+.It Cm enable (dhclient | slaac | static) Op Ar ifname
+Enable processing of future proposals of the specified source.
+.It Cm kill Ar xid
+Delete the proposal with the xid
+.Ar xid .
 .It Cm log brief
 Disable verbose debug logging.
 .It Cm log verbose
 Enable verbose debug logging.
 .It Cm reload
 Reload the configuration file.
-.It Cm kill Ar xid
-Delete the proposal with the xid
-.Ar xid .
 .It Cm show main
 Display information obtained from the main process.
 .It Cm show frontend

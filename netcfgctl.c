@@ -127,19 +127,19 @@ main(int argc, char *argv[])
 		break;
 	case SHOW_STATIC:
 		cpid.ifindex = res->ifindex;
-		cpid.source = STATIC_PROPOSAL;
+		cpid.source = RTP_PROPOSAL_STATIC;
 		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
 		    &cpid, sizeof(cpid));
 		break;
 	case SHOW_DHCLIENT:
 		cpid.ifindex = res->ifindex;
-		cpid.source = DHCLIENT_PROPOSAL;
+		cpid.source = RTP_PROPOSAL_DHCLIENT;
 		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
 		    &cpid, sizeof(cpid));
 		break;
 	case SHOW_SLAAC:
 		cpid.ifindex = res->ifindex;
-		cpid.source = SLAAC_PROPOSAL;
+		cpid.source = RTP_PROPOSAL_SLAAC;
 		imsg_compose(ibuf, IMSG_CTL_SHOW_PROPOSALS, 0, 0, -1,
 		    &cpid, sizeof(cpid));
 		break;
@@ -247,14 +247,11 @@ show_proposals_msg(struct imsg *imsg)
 	switch (imsg->hdr.type) {
 	case IMSG_CTL_REPLY_V4PROPOSAL:
 		p4 = imsg->data;
-		printf("xid: %d index: %d source: %d mtu: %d\n",
-		    p4->xid, p4->index, p4->source, p4->mtu);
-		if (p4->addrs & RTA_GATEWAY) {
-			pbuf = inet_ntop(AF_INET, &p4->gateway, buf,
-			    INET_ADDRSTRLEN);
-			printf("             gateway: %s\n",
-			    pbuf ? buf : strerror(errno));
-		}
+		printf("xid: %d index: %d source: %d ", p4->xid, p4->index,
+		    p4->source);
+		if (p4->inits & RTV_MTU)
+			printf("mtu: %d\n", p4->mtu);
+		printf("\n");
 		if (p4->addrs & RTA_IFA) {
 			pbuf = inet_ntop(AF_INET, &p4->ifa, buf,
 			    INET_ADDRSTRLEN);
@@ -267,42 +264,30 @@ show_proposals_msg(struct imsg *imsg)
 			printf("             netmask: %s\n",
 			    pbuf ? buf : strerror(errno));
 		}
-		if (p4->addrs & RTA_DNS1) {
-			pbuf = inet_ntop(AF_INET, &p4->dns1, buf,
-			    INET_ADDRSTRLEN);
-			printf("                dns1: %s\n",
-			    pbuf ? buf : strerror(errno));
+		if (p4->addrs & RTA_DNS) {
+			unsigned int cnt, i;
+			struct in_addr addr;
+			cnt = p4->rtdns_len / sizeof(struct in_addr);
+			printf("                dns: ");
+			for (i = 0; i < cnt; i++) {
+				memcpy(&addr.s_addr, &p4->rtdns[i],
+				    sizeof(addr.s_addr));
+				printf("%s ", inet_ntoa(addr));
+			}
+			printf("\n");
 		}
-		if (p4->addrs & RTA_DNS2) {
-			pbuf = inet_ntop(AF_INET, &p4->dns2, buf,
-			    INET_ADDRSTRLEN);
-			printf("                dns2: %s\n",
-			    pbuf ? buf : strerror(errno));
+		if (p4->addrs & RTA_SEARCH) {
+			printf("             search: %*s\n",
+			    p4->rtsearch_len, p4->rtsearch);
 		}
-		if (p4->addrs & RTA_DNS3) {
-			pbuf = inet_ntop(AF_INET, &p4->dns3, buf,
-			    INET_ADDRSTRLEN);
-			printf("                dns3: %s\n",
-			    pbuf ? buf : strerror(errno));
-		}
-		if (p4->addrs & RTA_DNS4) {
-			pbuf = inet_ntop(AF_INET, &p4->dns4, buf,
-			    INET_ADDRSTRLEN);
-			printf("                dns4: %s\n",
-			    pbuf ? buf : strerror(errno));
-		}
-		printf("\n");
 		break;
 	case IMSG_CTL_REPLY_V6PROPOSAL:
 		p6 = imsg->data;
-		printf("xid: %d index: %d source: %d mtu: %d\n",
-		    p6->xid, p6->index, p6->source, p6->mtu);
-		if (p6->addrs & RTA_GATEWAY) {
-			pbuf = inet_ntop(AF_INET6, &p6->gateway, buf,
-			    INET6_ADDRSTRLEN);
-			printf("             gateway: %s\n",
-			    pbuf ? buf : strerror(errno));
-		}
+		printf("xid: %d index: %d source: %d ", p6->xid, p6->index,
+		    p6->source);
+		if (p6->inits & RTV_MTU)
+			printf("mtu: %d\n", p6->mtu);
+		printf("\n");
 		if (p6->addrs & RTA_IFA) {
 			pbuf = inet_ntop(AF_INET6, &p6->ifa, buf,
 			    INET6_ADDRSTRLEN);
@@ -315,29 +300,22 @@ show_proposals_msg(struct imsg *imsg)
 			printf("             netmask: %s\n",
 			    pbuf ? buf : strerror(errno));
 		}
-		if (p6->addrs & RTA_DNS1) {
-			pbuf = inet_ntop(AF_INET6, &p6->dns1, buf,
-			    INET6_ADDRSTRLEN);
-			printf("                dns1: %s\n",
-			    pbuf ? buf : strerror(errno));
+		if (p6->addrs & RTA_DNS) {
+			struct in6_addr addr;
+			unsigned int cnt, i;
+			cnt = p6->rtdns_len / sizeof(struct in6_addr);
+			printf("                dns: ");
+			for (i = 0; i < cnt; i++) {
+				memcpy(&addr, &p6->rtdns[i], sizeof(addr));
+				pbuf = inet_ntop(AF_INET6, &addr, buf,
+				    INET6_ADDRSTRLEN);
+				printf("%s ", pbuf ? buf : strerror(errno));
+			}
+			printf("\n");
 		}
-		if (p6->addrs & RTA_DNS2) {
-			pbuf = inet_ntop(AF_INET6, &p6->dns2, buf,
-			    INET6_ADDRSTRLEN);
-			printf("                dns2: %s\n",
-			    pbuf ? buf : strerror(errno));
-		}
-		if (p6->addrs & RTA_DNS3) {
-			pbuf = inet_ntop(AF_INET6, &p6->dns3, buf,
-			    INET6_ADDRSTRLEN);
-			printf("                dns3: %s\n",
-			    pbuf ? buf : strerror(errno));
-		}
-		if (p6->addrs & RTA_DNS4) {
-			pbuf = inet_ntop(AF_INET6, &p6->dns4, buf,
-			    INET6_ADDRSTRLEN);
-			printf("                dns4: %s\n",
-			    pbuf ? buf : strerror(errno));
+		if (p6->addrs & RTA_SEARCH) {
+			printf("             search: %*s\n",
+			    p6->rtsearch_len, p6->rtsearch);
 		}
 		printf("\n");
 		break;

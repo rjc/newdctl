@@ -189,11 +189,11 @@ match_token(const char *word, const struct token *table,
 		case SOURCE:
 			if (!match && word != NULL && strlen(word) > 0) {
 				if (strcmp(word, "dhclient") == 0)
-					res->payload = DHCLIENT_PROPOSAL;
+					res->payload = RTP_PROPOSAL_DHCLIENT;
 				else if (strcmp(word, "slaac") == 0)
-					res->payload = SLAAC_PROPOSAL;
+					res->payload = RTP_PROPOSAL_SLAAC;
 				else if (strcmp(word, "static") == 0)
-					res->payload = STATIC_PROPOSAL;
+					res->payload = RTP_PROPOSAL_STATIC;
 				else {
 					fprintf(stderr, "not a good source");
 					break;

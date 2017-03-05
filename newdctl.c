@@ -231,8 +231,8 @@ show_frontend_msg(struct imsg *imsg)
 	switch (imsg->hdr.type) {
 	case IMSG_CTL_SHOW_FRONTEND_INFO:
 		cfi = imsg->data;
-		printf("frontend says: 0x%x %d %d '%s'",
-		    cfi->opts, cfi->yesno, cfi->integer, cfi->global_text);
+		printf("frontend says: %d %d '%s'",
+		    cfi->yesno, cfi->integer, cfi->global_text);
 		printf("\n");
 		break;
 	case IMSG_CTL_END:

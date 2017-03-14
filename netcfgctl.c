@@ -110,7 +110,7 @@ main(int argc, char *argv[])
 	case KILL_XID:
 		imsg_compose(ibuf, IMSG_CTL_KILL_PROPOSAL, 0, 0, -1,
 		    &res->payload, sizeof(res->payload));
-		printf("kill proposal '%d' request send.\n", res->payload);
+		printf("kill proposal '%0x' request send.\n", res->payload);
 		done = 1;
 		break;
 	case LOG_VERBOSE:
@@ -239,6 +239,7 @@ show_main_msg(struct imsg *imsg)
 int
 show_proposals_msg(struct imsg *imsg)
 {
+	char			 ifname[IF_NAMESIZE];
 	char			 buf[INET6_ADDRSTRLEN];
 	const char		*pbuf;
 	struct imsg_v4proposal	*p4;
@@ -247,8 +248,23 @@ show_proposals_msg(struct imsg *imsg)
 	switch (imsg->hdr.type) {
 	case IMSG_CTL_REPLY_V4PROPOSAL:
 		p4 = imsg->data;
-		printf("xid: %d index: %d source: %d ", p4->xid, p4->index,
-		    p4->source);
+		pbuf = if_indextoname(p4->index, ifname);
+		printf("xid: %0x index: %d (%s) source: %d ", p4->xid,
+		    p4->index, pbuf ? pbuf : "???", p4->source);
+		switch (p4->source) {
+		case RTP_PROPOSAL_DHCLIENT:
+			printf("(dhclient)");
+			break;
+		case RTP_PROPOSAL_STATIC:
+			printf("(static)");
+			break;
+		case RTP_PROPOSAL_SLAAC:
+			printf("(slaac)");
+			break;
+		default:
+			printf("(\?\?\?)");
+			break;
+		}
 		if (p4->inits & RTV_MTU)
 			printf("mtu: %d\n", p4->mtu);
 		printf("\n");
@@ -268,7 +284,7 @@ show_proposals_msg(struct imsg *imsg)
 			unsigned int cnt, i;
 			struct in_addr addr;
 			cnt = p4->rtdns_len / sizeof(struct in_addr);
-			printf("                dns: ");
+			printf("                 dns: ");
 			for (i = 0; i < cnt; i++) {
 				memcpy(&addr.s_addr, &p4->rtdns[i],
 				    sizeof(addr.s_addr));
@@ -277,7 +293,7 @@ show_proposals_msg(struct imsg *imsg)
 			printf("\n");
 		}
 		if (p4->addrs & RTA_SEARCH) {
-			printf("             search: %*s\n",
+			printf("              search: %*s\n",
 			    p4->rtsearch_len, p4->rtsearch);
 		}
 		break;

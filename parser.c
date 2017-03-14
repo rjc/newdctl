@@ -24,6 +24,7 @@
 #include <netinet/in.h>
 
 #include <err.h>
+#include <errno.h>
 #include <event.h>
 #include <imsg.h>
 #include <limits.h>
@@ -175,11 +176,21 @@ match_token(const char *word, const struct token *table,
 			break;
 		case XID:
 			if (!match && word != NULL && strlen(word) > 0) {
-				const char *errstr;
-				res->payload = strtonum(word, INT_MIN, INT_MAX,
-				    &errstr);
-				if (errstr != NULL)
-					errx(1, "xid is %s:%s", errstr, word);
+				char *ep;
+				long lval;
+				unsigned int val;
+				errno = 0;
+				lval = strtol(word, &ep, 16);
+				if (word[0] == '\0' || *ep != '\0')
+					errx(1, "xid is not a number");
+				if ((errno == ERANGE && (lval == LONG_MAX ||
+				    lval == LONG_MIN)) || (lval > UINT_MAX ||
+				    lval < 0))
+					errx(1, "xid is out of range %ld",
+					    lval);
+				val = lval;
+				memcpy(&res->payload, &val,
+				    sizeof(res->payload));
 				match++;
 				t = &table[i];
 				if (t->value)

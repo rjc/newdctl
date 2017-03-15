@@ -63,6 +63,7 @@ static const struct token t_main[] = {
 	{KEYWORD,	"show",		NONE,		t_show},
 	{KEYWORD,	"log",		NONE,		t_loglevel},
 	{KEYWORD,	"kill",		KILL_XID,	t_xid},
+	{KEYWORD,	"discard",	DISCARD_XID,	t_xid},
 	{KEYWORD,	"enable",	ENABLE_SOURCE,	t_source},
 	{KEYWORD,	"disable",	DISABLE_SOURCE,	t_source},
 	{ENDTOKEN,	"",		NONE,		NULL}

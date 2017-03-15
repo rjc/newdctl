@@ -113,6 +113,12 @@ main(int argc, char *argv[])
 		printf("kill proposal '%0x' request send.\n", res->payload);
 		done = 1;
 		break;
+	case DISCARD_XID:
+		imsg_compose(ibuf, IMSG_CTL_DISCARD_PROPOSAL, 0, 0, -1,
+		    &res->payload, sizeof(res->payload));
+		printf("discard proposal '%0x' request send.\n", res->payload);
+		done = 1;
+		break;
 	case LOG_VERBOSE:
 		verbose = 1;
 		/* FALLTHROUGH */

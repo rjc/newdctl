@@ -50,9 +50,16 @@ The following commands are available:
 Disable processing of further proposals of the specified source.
 .It Cm enable (dhclient | slaac | static) Op Ar ifname
 Enable processing of future proposals of the specified source.
+.It Cm discard Ar xid
+Discard the proposal with the xid
+.Ar xid .
+The proposal is simply discarded, without trying to undo its effects.
 .It Cm kill Ar xid
 Delete the proposal with the xid
 .Ar xid .
+The proposal is undone, its address, routes and resolv.conf effects
+backed out.
+The proposal is then deleted.
 .It Cm log brief
 Disable verbose debug logging.
 .It Cm log verbose

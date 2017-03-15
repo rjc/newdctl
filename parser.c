@@ -40,7 +40,6 @@ enum token_type {
 	ENDTOKEN,
 	IFNAME,
 	XID,
-	SOURCE,
 	KEYWORD
 };
 
@@ -86,9 +85,9 @@ static const struct token t_show[] = {
 };
 
 static const struct token t_source[] = {
-	{SOURCE,	"static",	NONE,	t_ifname},
-	{SOURCE,	"dhclient",	NONE,	t_ifname},
-	{SOURCE,	"slaac",	NONE,	t_ifname},
+	{KEYWORD,	"static",	NONE,	t_ifname},
+	{KEYWORD,	"dhclient",	NONE,	t_ifname},
+	{KEYWORD,	"slaac",	NONE,	t_ifname},
 	{ENDTOKEN,	"",		NONE,	NULL}
 };
 
@@ -198,24 +197,6 @@ match_token(const char *word, const struct token *table,
 					res->action = t->value;
 			}
 			break;
-		case SOURCE:
-			if (!match && word != NULL && strlen(word) > 0) {
-				if (strcmp(word, "dhclient") == 0)
-					res->payload = RTP_PROPOSAL_DHCLIENT;
-				else if (strcmp(word, "slaac") == 0)
-					res->payload = RTP_PROPOSAL_SLAAC;
-				else if (strcmp(word, "static") == 0)
-					res->payload = RTP_PROPOSAL_STATIC;
-				else {
-					fprintf(stderr, "not a good source");
-					break;
-				}
-				match++;
-				t = &table[i];
-				if (t->value)
-					res->action = t->value;
-			}
-			break;
 		case KEYWORD:
 			if (word != NULL && strncmp(word, table[i].keyword,
 			    strlen(word)) == 0) {
@@ -223,6 +204,12 @@ match_token(const char *word, const struct token *table,
 				t = &table[i];
 				if (t->value)
 					res->action = t->value;
+				if (strcmp(word, "dhclient") == 0)
+					res->payload = RTP_PROPOSAL_DHCLIENT;
+				else if (strcmp(word, "slaac") == 0)
+					res->payload = RTP_PROPOSAL_SLAAC;
+				else if (strcmp(word, "static") == 0)
+					res->payload = RTP_PROPOSAL_STATIC;
 			}
 			break;
 		case ENDTOKEN:
@@ -261,9 +248,6 @@ show_valid_args(const struct token *table)
 			break;
 		case XID:
 			fprintf(stderr, " <xid>\n");
-			break;
-		case SOURCE:
-			fprintf(stderr, " dhclient | slaac | static");
 			break;
 		case ENDTOKEN:
 			break;

@@ -1,9 +1,9 @@
 #	$OpenBSD$
 
-PROG=	newdctl
-SRCS=	newdctl.c parser.c
+PROG=	newctl
+SRCS=	newctl.c parser.c
 
-MAN=	newdctl.8
+MAN=	newctl.8
 
 CFLAGS+= -Wall
 CFLAGS+= -Wstrict-prototypes -Wmissing-prototypes
